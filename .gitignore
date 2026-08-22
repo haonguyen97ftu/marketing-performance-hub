@@ -1,0 +1,39 @@
+# Local Apps Script binding and authentication
+.clasp.json
+.clasprc.json
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*credential*
+*credentials*
+*secret*
+*token*
+*.pem
+*.key
+*.p8
+
+# Production data and workbook exports
+data/
+exports/
+backups/
+archive/
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.ods
+
+# Generated output and dependencies
+dist/
+tmp/
+node_modules/
+*.log
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

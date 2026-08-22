@@ -1,0 +1,23 @@
+name: Public release checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Scan for secrets and private artifacts
+        run: bash scripts/security-scan.sh
+
+      - name: Validate Apps Script and sidebar syntax
+        run: node scripts/validate-apps-script.js
+

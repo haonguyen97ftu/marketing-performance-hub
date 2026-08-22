@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --ink:#17324d; --muted:#667085; --line:#e4e9ef; --bg:#f6f8fb;
+      --card:#fff; --brand:#2f6f64; --brand2:#24574f; --ok:#197a55;
+      --warn:#b66a00; --bad:#b42318; --soft:#eef5f3;
+    }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:#17202a;
+      font:13px/1.45 Arial,sans-serif} button,input,select{font:inherit}
+    .top{position:sticky;top:0;z-index:5;background:#17324d;color:#fff;padding:14px 14px 10px}
+    .title{font-size:16px;font-weight:700}.sub{font-size:11px;opacity:.72;margin-top:2px}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:11px}
+    .tab{border:0;border-radius:7px;padding:7px 4px;background:rgba(255,255,255,.1);
+      color:#fff;cursor:pointer;font-size:11px}.tab.active{background:#fff;color:#17324d;font-weight:700}
+    main{padding:12px}.panel{display:none}.panel.active{display:block}.card{background:var(--card);
+      border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+    h2{font-size:13px;margin:0 0 9px;color:var(--ink)}.row{display:flex;gap:8px;align-items:center}
+    .between{justify-content:space-between}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .metric{background:#f8fafc;border-radius:8px;padding:9px}.metric b{display:block;font-size:17px;color:var(--ink)}
+    .metric span,.hint{font-size:11px;color:var(--muted)}.badge{display:inline-block;border-radius:999px;
+      padding:3px 8px;font-size:10px;font-weight:700}.ok{background:#e9f7f0;color:var(--ok)}
+    .warn{background:#fff3df;color:var(--warn)}.bad{background:#feeceb;color:var(--bad)}
+    .neutral{background:#eef1f5;color:#59636e}.platform{padding:9px 0;border-top:1px solid var(--line)}
+    .platform:first-of-type{border-top:0}.platform-name{font-weight:700}.meta{font-size:11px;color:var(--muted);margin-top:2px}
+    .btn{border:0;border-radius:8px;padding:9px 11px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+    .btn:hover{background:var(--brand2)}.btn.secondary{background:#eef2f6;color:var(--ink)}
+    .btn.danger{background:#fff0ef;color:var(--bad)}.btn:disabled{opacity:.5;cursor:wait}
+    .btn.full{width:100%}.field{margin-bottom:9px}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+    input,select{width:100%;border:1px solid #ccd4dd;border-radius:7px;padding:8px;background:#fff;color:#17202a}
+    .account{display:grid;grid-template-columns:auto 1fr;gap:8px;padding:9px 0;border-top:1px solid var(--line)}
+    .account:first-child{border-top:0}.account input{width:auto;margin-top:3px}.account-name{font-weight:700}
+    .scroll{max-height:420px;overflow:auto}.action{border-top:1px solid var(--line);padding:10px 0}
+    .action:first-of-type{border-top:0}.result{display:none;margin-top:9px;padding:9px;border-radius:8px;background:#f5f7fa;
+      white-space:pre-wrap;font:11px/1.4 monospace;max-height:180px;overflow:auto}.result.show{display:block}
+    .log{border-top:1px solid var(--line);padding:8px 0}.log:first-child{border-top:0}.log-title{font-weight:700}
+    .sheet-list{display:flex;flex-wrap:wrap;gap:6px}.sheet{border:1px solid var(--line);background:#fff;border-radius:7px;
+      padding:6px 8px;color:var(--ink);cursor:pointer}.empty{text-align:center;color:var(--muted);padding:16px}
+    .bar{height:8px;background:#edf1f5;border-radius:99px;overflow:hidden;margin:7px 0}.bar>i{display:block;height:100%;background:var(--brand)}
+    .overlay{display:none;position:fixed;inset:0;background:rgba(246,248,251,.86);z-index:20;
+      align-items:center;justify-content:center;text-align:center}.overlay.show{display:flex}.spinner{width:26px;height:26px;
+      border:3px solid #d7e3e0;border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="title">Marketing Spend Hub</div>
+    <div class="sub">Project operations console</div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="sync">Sync</button>
+      <button class="tab" data-tab="accounts">Accounts</button>
+      <button class="tab" data-tab="payments">Payments</button>
+      <button class="tab" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="quality">Quality</button>
+      <button class="tab" data-tab="logs">Logs</button>
+    </nav>
+  </header>
+  <main>
+    <section id="overview" class="panel active"><div class="card"><div class="empty">Loading overview…</div></div></section>
+    <section id="sync" class="panel"></section>
+    <section id="accounts" class="panel"></section>
+    <section id="payments" class="panel"></section>
+    <section id="dashboard" class="panel"></section>
+    <section id="quality" class="panel"></section>
+    <section id="logs" class="panel"></section>
+  </main>
+  <div id="overlay" class="overlay"><div><div class="spinner"></div><b id="busyText">Working…</b><div class="hint">Keep this sidebar open</div></div></div>
+  <script>
+    const loaded={overview:false,sync:false,accounts:false,payments:false,dashboard:false,quality:false,logs:false};
+    let overviewModel=null, accountBaseline={}, dashboardModel=null, paymentModel=null;
+    const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const el=id=>document.getElementById(id);
+    const server=(fn,...args)=>new Promise((resolve,reject)=>{
+      const runner=google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e&&e.message?e.message:String(e))));
+      runner[fn](...args);
+    });
+    function busy(on,text){el('overlay').classList.toggle('show',on);el('busyText').textContent=text||'Working…'}
+    function badge(state){const good=['HEALTHY','SUCCESS','VALID','CONFIGURED'].includes(state);const bad=['FAILED','ACTION_REQUIRED','CONFIG_MISSING'].includes(state);return `<span class="badge ${good?'ok':bad?'bad':state==='DISABLED'||state==='NO_ACCOUNT'?'neutral':'warn'}">${esc(state||'UNKNOWN')}</span>`}
+    function err(e,target){const box=target||document.querySelector('.panel.active .result');if(box){box.textContent=e.message;box.classList.add('show')}else console.error(e)}
+    document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+    async function openTab(name){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));if(!loaded[name])await loadTab(name)}
+    async function loadTab(name){try{
+      if(name==='overview'||name==='sync'){if(!overviewModel)overviewModel=await server('getMarketingProjectOverview200');renderOverview();renderSync();loaded.overview=loaded.sync=true}
+      if(name==='accounts'){renderLoading(name);const m=await server('getMarketingProjectAccounts200');renderAccounts(m);loaded.accounts=true}
+      if(name==='payments'){renderLoading(name);paymentModel=await server('getMarketingPaymentMonitor201');renderPayments(paymentModel);loaded.payments=true}
+      if(name==='dashboard'){renderLoading(name);dashboardModel=await server('getMarketingProjectDashboard200');renderDashboard(dashboardModel);loaded.dashboard=true}
+      if(name==='quality'){renderQuality();loaded.quality=true}
+      if(name==='logs'){renderLoading(name);renderLogs(await server('getMarketingProjectLogs200'));loaded.logs=true}
+    }catch(e){el(name).innerHTML=`<div class="card"><span class="badge bad">ERROR</span><p>${esc(e.message)}</p></div>`}}
+    function renderLoading(name){el(name).innerHTML='<div class="card"><div class="empty">Loading…</div></div>'}
+    function renderOverview(){const m=overviewModel,a=m.automation,s=m.summary;
+      el('overview').innerHTML=`<div class="card"><div class="row between"><h2>System health</h2>${badge(m.overallState)}</div><div class="grid2"><div class="metric"><b>${s.enabledAccounts}/${s.totalAccounts}</b><span>Enabled accounts</span></div><div class="metric"><b>${s.configuredPlatforms}/5</b><span>Platforms configured</span></div><div class="metric"><b>${s.rawRows}</b><span>Raw rows</span></div><div class="metric"><b>${s.dailyRows}</b><span>Daily rows</span></div></div></div>
+      <div class="card"><div class="row between"><h2>Daily automation</h2>${badge(a.triggerInstalled&&a.triggerCount===1?'HEALTHY':'ACTION_REQUIRED')}</div><div class="meta">${a.triggerInstalled?'Runs daily around '+a.configuredHour+':00':'Daily trigger is disabled'} · ${esc(a.timezone)}</div><div class="meta">Last run: ${esc(a.lastRunAt||'Never')} · ${esc(a.lastRunStatus||'No result')}</div></div>
+      <div class="card"><h2>Platforms</h2>${m.platforms.map(p=>`<div class="platform"><div class="row between"><div class="platform-name">${esc(p.platform)}</div>${badge(p.state)}</div><div class="meta">${p.enabledAccounts}/${p.accounts} accounts enabled · Latest data ${esc(p.latestDataDate||'—')}</div></div>`).join('')}</div>
+      <div class="card"><h2>Open sheet</h2><div class="sheet-list">${m.sheetLinks.map(n=>`<button class="sheet" onclick="openSheet('${esc(n)}')">${esc(n)}</button>`).join('')}</div></div>`}
+    function renderSync(){if(!overviewModel)return;const a=overviewModel.automation,w=overviewModel.syncWindow||{},max=w.latestCompletedDate||'';
+      el('sync').innerHTML=`<div class="card"><h2>Sync Center</h2><p class="hint">Runs silently in the background. Custom ranges are limited to ${esc(w.maxRangeDays||31)} completed days.</p><div class="field"><label>Timeline</label><select id="syncTimeline" onchange="setSyncTimeline()"><option value="ROLLING">Normal rolling sync</option><option value="1">Yesterday</option><option value="3">Last 3 completed days</option><option value="7">Last 7 completed days</option><option value="14">Last 14 completed days</option><option value="30">Last 30 completed days</option><option value="CUSTOM">Custom range</option></select></div><div class="grid2"><div class="field"><label>Start date</label><input id="syncStart" type="date" max="${esc(max)}" disabled></div><div class="field"><label>End date</label><input id="syncEnd" type="date" max="${esc(max)}" disabled></div></div><button class="btn full" onclick="syncNow()">Sync all enabled platforms now</button><div id="syncResult" class="result"></div></div>
+      <div class="card"><h2>Daily schedule</h2><div class="field"><label>Run hour (${esc(a.timezone)})</label><select id="scheduleHour">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i===Number(a.configuredHour)?'selected':''}>${String(i).padStart(2,'0')}:00</option>`).join('')}</select></div><div class="grid2"><button class="btn" onclick="schedule('ENABLE')">Enable / update</button><button class="btn danger" onclick="schedule('DISABLE')">Disable</button></div><div id="scheduleResult" class="result"></div></div>`}
+    function shiftIso(iso,days){const p=String(iso).split('-').map(Number),d=new Date(Date.UTC(p[0],p[1]-1,p[2]));d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10)}
+    function setSyncTimeline(){const v=el('syncTimeline').value,s=el('syncStart'),e=el('syncEnd'),latest=(overviewModel.syncWindow||{}).latestCompletedDate||'';if(v==='ROLLING'){s.value=e.value='';s.disabled=e.disabled=true;return}e.value=latest;if(v==='CUSTOM'){s.disabled=e.disabled=false;if(!s.value)s.value=e.value;return}s.value=shiftIso(latest,-(Number(v)-1));s.disabled=e.disabled=true}
+    async function syncNow(){const out=el('syncResult'),payload={startDate:el('syncStart').value,endDate:el('syncEnd').value};busy(true,'Starting background sync…');try{const r=await server('startMarketingProjectSyncJob200',payload);out.textContent='Sync queued. You can continue using the sheet.';out.classList.add('show');pollSync(out)}catch(e){err(e,out)}finally{busy(false)}}
+    async function pollSync(out){try{const j=await server('getMarketingProjectSyncJob200');if(j.state==='QUEUED'||j.state==='RUNNING'){out.textContent='Status: '+j.state+' · '+(j.updatedAt||'');setTimeout(()=>pollSync(out),4000);return}out.textContent=JSON.stringify(j.result||j,null,2);overviewModel=null;loaded.overview=false;loaded.payments=false}catch(e){err(e,out)}}
+    async function schedule(action){if(action==='DISABLE'&&!confirm('Disable the daily production sync trigger?'))return;const out=el('scheduleResult');busy(true,'Updating schedule…');try{const r=await server('updateMarketingProjectSchedule200',{action,hour:Number(el('scheduleHour').value)});out.textContent=JSON.stringify(r,null,2);out.classList.add('show');overviewModel=null;loaded.overview=false}catch(e){err(e,out)}finally{busy(false)}}
+    function renderAccounts(m){accountBaseline={};m.accounts.forEach(a=>accountBaseline[a.platform+'|'+a.accountId]=a.enabled);
+      el('accounts').innerHTML=`<div class="card"><div class="row between"><h2>Advertising accounts</h2><span class="badge neutral">${m.accounts.length}</span></div><div class="scroll">${m.accounts.length?m.accounts.map((a,i)=>`<label class="account"><input type="checkbox" class="accountToggle" data-platform="${esc(a.platform)}" data-id="${esc(a.accountId)}" ${a.enabled?'checked':''}><span><span class="account-name">${esc(a.accountName||a.accountId)}</span><span class="meta">${esc(a.platform)} · ${esc(a.currency||'—')} · ${esc(a.status||'—')}</span></span></label>`).join(''):'<div class="empty">No registered accounts</div>'}</div><button class="btn full" onclick="saveAccounts()">Save enabled accounts</button><div id="accountResult" class="result"></div></div>`}
+    async function saveAccounts(){const changes=[...document.querySelectorAll('.accountToggle')].map(x=>({platform:x.dataset.platform,accountId:x.dataset.id,enabled:x.checked})).filter(x=>accountBaseline[x.platform+'|'+x.accountId]!==x.enabled);const out=el('accountResult');if(!changes.length){out.textContent='No changes.';out.classList.add('show');return}busy(true,'Saving account settings…');try{const m=await server('saveMarketingProjectAccounts200',{changes});renderAccounts(m);overviewModel=null;loaded.overview=false}catch(e){err(e,out)}finally{busy(false)}}
+    function renderPayments(m){paymentModel=m;el('payments').innerHTML=`<div class="card"><div class="row between"><h2>Payment monitoring</h2><button class="btn secondary" onclick="reloadPayments()">Refresh</button></div><p class="hint">Thresholds are manual when billing permission is unavailable. Spend is calculated from Spend_Daily from the cycle start; Manual current amount overrides it.</p><div class="scroll">${m.accounts.map((a,i)=>`<div class="platform"><div class="row between"><b>${esc(a.accountName||a.accountId)}</b>${badge(a.state)}</div><div class="meta">${esc(a.platform)} · ${esc(a.currency)} · ${a.percent===null?'Not configured':Number(a.percent).toFixed(1)+'% used'}</div><div class="bar"><i style="width:${Math.min(100,Number(a.percent||0))}%"></i></div><div class="grid2"><div class="field"><label>Payment threshold</label><input class="pThreshold" data-i="${i}" type="number" min="0" step="0.01" value="${a.threshold??''}"></div><div class="field"><label>Warning at %</label><input class="pWarning" data-i="${i}" type="number" min="1" max="100" value="${a.warningAt}"></div><div class="field"><label>Billing cycle start</label><input class="pCycle" data-i="${i}" type="date" value="${esc(a.cycleStart||'')}"></div><div class="field"><label>Manual current amount</label><input class="pCurrent" data-i="${i}" type="number" min="0" step="0.01" value="${a.manualCurrent??''}"></div></div><div class="meta">Used ${Number(a.current||0).toFixed(2)} · Remaining ${a.remaining===null?'—':Number(a.remaining).toFixed(2)} · ${esc(a.dataSource)}</div></div>`).join('')}</div><button class="btn full" onclick="savePayments()">Save & refresh warnings</button><button class="btn secondary full" style="margin-top:7px" onclick="openSheet('Payment_Monitor')">Open payment sheet</button><div id="paymentResult" class="result"></div></div>`}
+    async function reloadPayments(){renderLoading('payments');paymentModel=await server('getMarketingPaymentMonitor201');renderPayments(paymentModel)}
+    async function savePayments(){const changes=paymentModel.accounts.map((a,i)=>({platform:a.platform,accountId:a.accountId,threshold:document.querySelector(`.pThreshold[data-i="${i}"]`).value,warningAt:document.querySelector(`.pWarning[data-i="${i}"]`).value,cycleStart:document.querySelector(`.pCycle[data-i="${i}"]`).value,manualCurrent:document.querySelector(`.pCurrent[data-i="${i}"]`).value}));busy(true,'Refreshing payment warnings…');try{paymentModel=await server('saveMarketingPaymentSettings201',{changes});renderPayments(paymentModel)}catch(e){err(e,el('paymentResult'))}finally{busy(false)}}
+    function options(items,value,field){return items.map(x=>{const v=field?x[field]:x;return `<option value="${esc(v)}" ${v===value?'selected':''}>${esc(v)}</option>`}).join('')}
+    function renderDashboard(m){dashboardModel=m;const s=m.selected;
+      el('dashboard').innerHTML=`<div class="card"><h2>Dashboard controls</h2><div class="grid2"><div class="field"><label>Start date</label><input id="dStart" type="date" min="${esc(m.minDate)}" max="${esc(m.maxDate)}" value="${esc(s.startDate)}"></div><div class="field"><label>End date</label><input id="dEnd" type="date" min="${esc(m.minDate)}" max="${esc(m.maxDate)}" value="${esc(s.endDate)}"></div></div><div class="field"><label>Platform</label><select id="dPlatform" onchange="filterAccountOptions()">${options(m.platforms,s.platform)}</select></div><div class="field"><label>Account</label><select id="dAccount"></select></div><div class="grid2"><div class="field"><label>Currency</label><select id="dCurrency">${options(m.currencies,s.currency)}</select></div><div class="field"><label>Chart metric</label><select id="dMetric">${options(m.metrics,s.metric)}</select></div></div><div class="grid2"><button class="btn" onclick="applyDashboard()">Apply</button><button class="btn secondary" onclick="resetDashboard()">Reset</button></div><div id="dashboardResult" class="result show">${m.matchedRows} matching rows · Updated ${esc(m.lastUpdated||'—')}</div></div>`;filterAccountOptions(s.account)}
+    function filterAccountOptions(selected){const p=el('dPlatform').value,all=dashboardModel.accounts.filter(a=>a.label==='All Accounts'||p==='All Platforms'||a.platform===p);el('dAccount').innerHTML=options(all,selected||dashboardModel.selected.account,'label')}
+    function dashboardPayload(){return{startDate:el('dStart').value,endDate:el('dEnd').value,platform:el('dPlatform').value,account:el('dAccount').value,currency:el('dCurrency').value,metric:el('dMetric').value}}
+    async function applyDashboard(){busy(true,'Updating dashboard…');try{dashboardModel=await server('applyMarketingProjectDashboard200',dashboardPayload());renderDashboard(dashboardModel);await openSheet('Dashboard')}catch(e){err(e,el('dashboardResult'))}finally{busy(false)}}
+    async function resetDashboard(){busy(true,'Resetting dashboard…');try{dashboardModel=await server('resetMarketingProjectDashboard200');renderDashboard(dashboardModel)}catch(e){err(e,el('dashboardResult'))}finally{busy(false)}}
+    function renderQuality(){el('quality').innerHTML=`<div class="card"><h2>Quality & maintenance</h2>${qaAction('DATA_QUALITY','Run data quality audit','Checks schema, keys, metrics, reconciliation and freshness.')}${qaAction('DASHBOARD_QA','Run Dashboard functional QA','Checks KPI, tables, derived metrics and chart.')}${qaAction('FILTER_QA','Run filter & performance QA','Tests real filter paths and restores the current selection.')}${qaAction('META_TOKEN_HEALTH','Check Meta token lifecycle','Validates permission and refresh state without displaying token.')}${qaAction('REBUILD_OUTPUTS','Rebuild derived outputs','Rebuilds Spend_Daily and refreshes Dashboard from existing raw data.')}${qaAction('CLEANUP_PREVIEW','Preview workbook cleanup','Shows which system, QA and legacy tabs will be hidden; unknown tabs stay untouched.')}${qaAction('CLEANUP_APPLY','Clean up workbook tabs','Migrates mixed connector logs, keeps three operational tabs visible and hides support tabs safely.')}${qaAction('SHOW_ALL_SHEETS','Show all project sheets','Reverses the tab-hiding part of cleanup.') }<div id="qualityResult" class="result"></div></div>`}
+    function qaAction(key,title,desc){return `<div class="action"><div class="row between"><div><b>${esc(title)}</b><div class="hint">${esc(desc)}</div></div><button class="btn secondary" onclick="maintenance('${key}')">Run</button></div></div>`}
+    async function maintenance(action){const out=el('qualityResult');busy(true,'Running '+action.replaceAll('_',' ').toLowerCase()+'…');try{const r=await server('runMarketingProjectMaintenance200',action);out.textContent=JSON.stringify(r,null,2);out.classList.add('show')}catch(e){err(e,out)}finally{busy(false)}}
+    function renderLogs(m){const block=(rows,type)=>rows.length?rows.map(r=>`<div class="log"><div class="row between"><span class="log-title">${esc(r.Status||r.Level||type)}</span>${badge(r.Status||r.Level||'LOG')}</div><div class="meta">${esc(r['Finished At']||r.Timestamp||r['Started At']||'')}</div><div class="meta">${esc(r['Safe Summary']||r.Message||r.Error||r['Error Message']||'')}</div></div>`).join(''):'<div class="empty">No entries</div>';
+      el('logs').innerHTML=`<div class="card"><div class="row between"><h2>Project sync log</h2><button class="btn secondary" onclick="reloadLogs()">Refresh</button></div><div class="scroll">${block(m.sync,'SYNC')}</div></div><div class="card"><h2>Platform / account log</h2><div class="scroll">${block(m.platform||[],'PLATFORM')}</div></div><div class="card"><h2>Error log</h2><div class="scroll">${block(m.errors,'ERROR')}</div></div>`}
+    async function reloadLogs(){renderLoading('logs');try{renderLogs(await server('getMarketingProjectLogs200'))}catch(e){el('logs').innerHTML=`<div class="card">${esc(e.message)}</div>`}}
+    async function openSheet(name){try{await server('activateMarketingProjectSheet200',name)}catch(e){alert(e.message)}}
+    loadTab('overview');
+  </script>
+</body>
+</html>
