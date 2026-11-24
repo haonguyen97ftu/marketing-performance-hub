@@ -17,6 +17,9 @@ single Google Sheet.
 - Normalized `Spend_Raw` and `Spend_Daily` datasets with reconciliation and QA.
 - A persistent, filterable dashboard that does not recreate its chart on every
   filter change.
+- Monthly audience age reports for Apple Ads, Meta, and TikTok in
+  `Age_Monthly`. Run a refresh from **Marketing Hub → Audience reporting**
+  or install the monthly schedule with `installMonthlyAgeTrigger20261106`.
 - Payment-threshold monitoring based on manually supplied billing thresholds
   and synchronized spend when billing API permission is unavailable.
 - Credential-presence health checks without writing secret values to Sheets.
@@ -95,4 +98,3 @@ project and operates on the active spreadsheet.
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
