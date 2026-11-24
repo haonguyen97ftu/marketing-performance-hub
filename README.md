@@ -62,6 +62,7 @@ The complete installation procedure is in [docs/SETUP.md](docs/SETUP.md).
 
 - [Project brief](docs/PROJECT_BRIEF.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Repository review and operator guide (Vietnamese)](docs/REPOSITORY_REVIEW.vi.md)
 - [Setup and deployment](docs/SETUP.md)
 - [Credential setup and rotation](docs/CREDENTIALS.md)
 - [Operations runbook](docs/OPERATIONS.md)
