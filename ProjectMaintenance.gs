@@ -11,7 +11,8 @@ var PROJECT_MAINTENANCE_210 = Object.freeze({
   VISIBLE_SHEETS: Object.freeze([
     "Dashboard",
     "Accounts",
-    "Payment_Monitor"
+    "Payment_Monitor",
+    "Age_Monthly"
   ]),
   SYSTEM_SHEETS: Object.freeze([
     "Spend_Raw",

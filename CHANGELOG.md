@@ -2,6 +2,12 @@
 
 All notable changes are documented here. Versions follow Semantic Versioning.
 
+## Unreleased
+
+- Added shared monthly audience age reporting for Apple Ads, Meta, and TikTok.
+- Added manual menu actions and an opt-in monthly trigger.
+- Reset stale dashboard styling when rebuilding the dashboard.
+
 ## 2.2.0 — 2026-08-22
 
 - Prepared a data-free public repository and complete operator documentation.
@@ -19,4 +25,3 @@ All notable changes are documented here. Versions follow Semantic Versioning.
 - Added payment monitoring, data quality repair, dashboard QA, and workbook
   cleanup functions.
 - Split project-run logging from connector/account-level logging.
-

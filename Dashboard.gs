@@ -695,7 +695,8 @@ function writeMarketingDashboardKpis192_(sheet, totals, matched) {
 
 function writeMarketingDashboardTables192_(sheet, accountOutput, dailyOutput) {
   const lastRow = Math.max(sheet.getLastRow(), 10);
-  sheet.getRange(10, 1, lastRow - 9, 14).breakApart().clearContent();
+  sheet.getRange(10, 1, lastRow - 9, 14).breakApart().clearContent()
+    .setBackground("#FFFFFF").setFontColor("#17324D").setFontWeight("normal");
   sheet
     .getRange(9, 1, 1, MARKETING_DASHBOARD_192.TABLE_HEADERS.length)
     .setValues([MARKETING_DASHBOARD_192.TABLE_HEADERS.slice()]);
@@ -830,7 +831,7 @@ function updateMarketingDashboardStatus192_(sheet, context, filters, detail) {
     matchedRows + " rows",
     "Metric: " + filters.metric,
     "Currency: " + filters.currency,
-    "Chart updates without being rebuilt"
+    "Chọn VND hoặc USD để xem đúng tiền tệ"
   ];
   if (detail && detail.trendTruncated) {
     notes.push(
