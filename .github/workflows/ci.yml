@@ -15,6 +15,11 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Install ripgrep
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ripgrep
+
       - name: Scan for secrets and private artifacts
         run: bash scripts/security-scan.sh
 
