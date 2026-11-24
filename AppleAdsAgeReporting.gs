@@ -503,11 +503,14 @@ function replaceAppleAdsAgeScopes20261105_(records, scopes) {
 
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   const oldDataRows = Math.max(0, sheet.getLastRow() - 1);
-  if (oldDataRows) {
-    sheet.getRange(2, 1, oldDataRows, headers.length).clearContent();
-  }
   if (output.length) {
     sheet.getRange(2, 1, output.length, headers.length).setValues(output);
+  }
+  if (oldDataRows > output.length) {
+    sheet.getRange(output.length + 2, 1, oldDataRows - output.length, headers.length)
+      .clearContent();
+  }
+  if (output.length) {
     sheet.getRange(2, 1, output.length, 1).setNumberFormat("yyyy-mm");
     sheet.getRange(2, 9, output.length, 1).setNumberFormat("#,##0.00");
     sheet.getRange(2, 10, output.length, 4).setNumberFormat("#,##0");

@@ -9,13 +9,19 @@ failed=0
 scan_pattern() {
   local label="$1"
   local pattern="$2"
-  if rg -n -U --hidden \
+  if rg --files-with-matches -U --hidden \
     -g '!scripts/security-scan.sh' \
     -g '!.git/**' \
     -g '!LICENSE' \
     -- "$pattern" .; then
     printf 'FAIL: %s\n' "$label" >&2
     failed=1
+  else
+    local status=$?
+    if (( status != 1 )); then
+      printf 'FAIL: ripgrep could not complete %s (exit %s).\n' "$label" "$status" >&2
+      exit 1
+    fi
   fi
 }
 
