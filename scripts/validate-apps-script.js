@@ -58,6 +58,9 @@ let combinedSource = '';
 for (const file of gsFiles) {
   const source = fs.readFileSync(path.join(root, file), 'utf8');
   combinedSource += `\n${source}`;
+  if (file === 'AutomationTrigger.gs' && /SpreadsheetApp\.getUi\(\)\.alert/.test(source)) {
+    errors.push('AutomationTrigger.gs must not use blocking UI alerts.');
+  }
   try {
     new Function(source);
   } catch (error) {
@@ -113,12 +116,6 @@ if (fs.existsSync(htmlPath)) {
   if (!html.includes('google.script.run')) {
     errors.push('ProjectControlPanel.html is not connected to google.script.run.');
   }
-}
-
-if (/SpreadsheetApp\.getUi\(\)\.alert/.test(
-  fs.readFileSync(path.join(root, 'AutomationTrigger.gs'), 'utf8')
-)) {
-  errors.push('AutomationTrigger.gs must not use blocking UI alerts.');
 }
 
 if (!combinedSource.includes('sanitizeLogText_')) {
